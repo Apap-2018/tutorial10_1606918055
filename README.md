@@ -1,1 +1,1 @@
-Write up: [a relative link](writeup.md)
+See [Write up](writeup.md)
