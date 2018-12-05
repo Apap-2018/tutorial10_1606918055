@@ -29,12 +29,35 @@
    ```javascript
    {
      poliRujukan: {
-       id: "value"
+       id: "value";
      }
    }
    ```
 
 ## Implementasi Latihan
+
+Appointment.js
+
+```javascript
+import { fetch } from "whatwg-fetch";
+
+const cors = "https://cors-anywhere.herokuapp.com";
+const apiUrl = "http://si-appointment.herokuapp.com/api";
+
+const baseUrl = `${cors}/${apiUrl}`;
+
+async function checkStatusAndTransform(p) {
+  return Promise.resolve(p).then(response => {
+    if (response.status >= 200 && response.status < 300) {
+      return response.json();
+    } else {
+      const error = new Error(response.statusText);
+      error.response = response.json();
+      throw error;
+    }
+  });
+}
+```
 
 ### 1. Daftar Seluruh Staff Farmasi
 
@@ -48,7 +71,25 @@ Buat fungsi untuk fetching data dari endpoint /getAllStaffFarmasi.
   }
 ```
 
-Lalu, buat stateless component StaffFarmasiRow seperti DaftarPasienRow, isinya berbeda hanya memunculkan row nama. Lalu buat screen baru DaftarStaffFarmasi sama seperti DaftarPasien. Buat fungsi componentDidMount
+Lalu, buat stateless component StaffFarmasiRow seperti DaftarPasienRow, isinya berbeda hanya memunculkan row nama.
+
+```jsx
+export const StaffFarmasiRow = props => {
+  return (
+    <tbody>
+      {props.listStaffFarmasi.map(staff => {
+        return (
+          <tr key={staff.id}>
+            <td>{staff.nama}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  );
+};
+```
+
+Lalu buat screen baru DaftarStaffFarmasi sama seperti DaftarPasien. Buat fungsi componentDidMount
 
 ```javascript
   componentDidMount() {

@@ -5,8 +5,8 @@ const apiUrl = "http://si-appointment.herokuapp.com/api";
 
 const baseUrl = `${cors}/${apiUrl}`;
 
-async function checkStatusAndTransform(promise) {
-  return promise.then(response => {
+async function checkStatusAndTransform(p) {
+  return Promise.resolve(p).then(response => {
     if (response.status >= 200 && response.status < 300) {
       return response.json();
     } else {
