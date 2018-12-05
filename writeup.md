@@ -117,6 +117,12 @@ Lalu buat fungsi render
   }
 ```
 
+Tambahkan routing baru untuk daftar staff farmasi
+
+```jsx
+<Route path="/staff-farmasi" exact component={DaftarStaffFarmasi} />
+```
+
 ### 2. Create Lab Result
 
 Tambahkan method untuk call endpoint pada Appointment.js
@@ -142,15 +148,16 @@ async addLabResult(jenis, hasil, tanggalPengajuan, idPasien) {
   }
 ```
 
-Sama seperti membuat update pasien, selanjutnya buat form berupa component stateless pada folder containers. Pada form baru ini tambahkan props listPasien.
+Sama seperti membuat update pasien, selanjutnya buat form berupa component stateless pada folder containers. Pada form baru ini tambahkan props idPasien untuk input hidden idPasien.
 
 ```jsx
 export class FormCreateLabResult extends React.PureComponent {
   render() {
-    const { onSubmit, listPasien } = this.props;
+    const { onSubmit, idPasien } = this.props;
     return (
       <form onSubmit={onSubmit}>
         <h2>Create Lab Result</h2>
+        <input name="idPasien" type="hidden" value={idPasien} />
         <div className="form-group">
           <label>
             Jenis<span style={{ color: "red" }}>*</span>
@@ -174,21 +181,6 @@ export class FormCreateLabResult extends React.PureComponent {
             required
           />
         </div>
-        <div className="form-group">
-          <label>
-            Pasien<span style={{ color: "red" }}>*</span>
-          </label>
-          <select className="form-control" name="idPasien" required>
-            <option value="">Pilih Pasien</option>
-            {listPasien.map((pasien, index) => {
-              return (
-                <option key={index} value={pasien.id}>
-                  {pasien.nama}
-                </option>
-              );
-            })}
-          </select>
-        </div>
         <button className="btn btn-success" value="submit">
           Submit
         </button>
@@ -198,14 +190,19 @@ export class FormCreateLabResult extends React.PureComponent {
 }
 ```
 
-Lalu buat screen CreateLabResult sama seperti UpdatePasien hanya saja pada componentDidMount kita call endpoint untuk load list pasien.
+Lalu buat screen CreateLabResult sama seperti UpdatePasien hanya saja pada componentDidMount kita call endpoint untuk load data pasien berdasarkan id yang didapat dari parameter idPasien pada url.
 
 ```javascript
   componentDidMount() {
-    Appointment.getAllPasien()
-      .then(({ result }) => this.setState({ listPasien: result }))
-      .catch(() => alert("Gagal melakukan load pasien"))
-      .finally(() => this.setState({ loading: false }));
+    const {
+      match: { params }
+    } = this.props;
+
+    if (params.idPasien) {
+      Appointment.getDetailPasien(params.idPasien)
+        .catch(() => alert("Gagal, pasien tidak dapat diload"))
+        .finally(() => this.setState({ loading: false }));
+    }
   }
 ```
 
@@ -216,9 +213,12 @@ lalu render form
     if (this.state.loading) {
       return <Loading msg="Fetching Data..." />;
     } else {
+      const {
+        match: { params }
+      } = this.props;
       return (
         <FormCreateLabResult
-          listPasien={this.state.listPasien}
+          idPasien={params.idPasien}
           onSubmit={this.handleFormSubmit}
         />
       );
@@ -257,4 +257,31 @@ handleFormSubmit = e => {
       });
   });
 };
+```
+
+Tambahkan routing untuk form membuat lab result
+
+```jsx
+<Route path="/create-lab-result/:idPasien" exact component={CreateLabResult} />
+```
+
+Lalu tambahkan column baru pada table daftar pasien. Pertama tambahkan di DaftarPasienRow
+
+```jsx
+<td>
+  <Link to={`/create-lab-result/${pasien.id}`} className="btn btn-info">
+    Tambah Hasil Lab
+  </Link>
+</td>
+```
+
+Kedua tambahkan column di table dengan membuka file DaftarPasien dan tambahkan column Lab di props header
+
+```jsx
+<TableContainer
+  title="Daftar Pasien"
+  header={["Nama Pasien", "Status Pasien", "Aksi", "Lab"]}
+>
+  ...
+</TableContainer>
 ```

@@ -33,7 +33,7 @@ export class DaftarPasien extends React.Component {
       return (
         <TableContainer
           title="Daftar Pasien"
-          header={["Nama Pasien", "Status Pasien", "Aksi"]}
+          header={["Nama Pasien", "Status Pasien", "Aksi", "Lab"]}
         >
           <DaftarPasienRow listPasien={this.state.listPasien} />
         </TableContainer>

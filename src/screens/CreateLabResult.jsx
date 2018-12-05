@@ -10,15 +10,19 @@ export class CreateLabResult extends React.Component {
    */
 
   state = {
-    loading: true,
-    listPasien: []
+    loading: true
   };
 
   componentDidMount() {
-    Appointment.getAllPasien()
-      .then(({ result }) => this.setState({ listPasien: result }))
-      .catch(() => alert("Gagal melakukan load pasien"))
-      .finally(() => this.setState({ loading: false }));
+    const {
+      match: { params }
+    } = this.props;
+
+    if (params.idPasien) {
+      Appointment.getDetailPasien(params.idPasien)
+        .catch(() => alert("Gagal, pasien tidak dapat diload"))
+        .finally(() => this.setState({ loading: false }));
+    }
   }
 
   handleFormSubmit = e => {
@@ -54,9 +58,12 @@ export class CreateLabResult extends React.Component {
     if (this.state.loading) {
       return <Loading msg="Fetching Data..." />;
     } else {
+      const {
+        match: { params }
+      } = this.props;
       return (
         <FormCreateLabResult
-          listPasien={this.state.listPasien}
+          idPasien={params.idPasien}
           onSubmit={this.handleFormSubmit}
         />
       );
