@@ -29,7 +29,7 @@
    ```javascript
    {
      poliRujukan: {
-       id: "value";
+       id: "value"
      }
    }
    ```
